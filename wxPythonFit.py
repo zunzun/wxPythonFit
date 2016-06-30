@@ -3,13 +3,6 @@ import os, sys, pickle
 import wx # ensure this import works before starting the application
 import matplotlib # ensure this import works before starting the application
 
-# ensure pyeq3 can be imported before starting the application
-if -1 != sys.path[0].find('pyeq3-master'):raise Exception('Please rename git checkout directory from "pyeq3-master" to "pyeq3"')
-exampleFileDirectory = sys.path[0][:sys.path[0].rfind(os.sep)]
-pyeq3IimportDirectory =  os.path.join(os.path.join(exampleFileDirectory, '..'), '..')
-if pyeq3IimportDirectory not in sys.path:
-    sys.path.append(pyeq3IimportDirectory)
-    
 import pyeq3
 
 # local imports from application subdirectory
@@ -118,10 +111,7 @@ class ApplicationFrame(wx.Frame):
             self.btnFit3D.Enable()
             self.statusBox.Hide()
 
-            currentDirectory = os.path.dirname(os.path.abspath(__file__))
-            dialogDirectory = os.path.join(currentDirectory, 'guifiles')
-            commandString = os.path.join(dialogDirectory, 'CustomDialogs.py')
-            p = os.popen(sys.executable + ' ' + commandString)
+            p = os.popen(sys.executable + ' FittingResultsViewer.py')
             p.close()
 
 

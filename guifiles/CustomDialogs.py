@@ -9,13 +9,10 @@ from matplotlib.figure import Figure
 import matplotlib
 import matplotlib.pyplot
 
-if -1 != sys.path[0].find('pyeq3-master'):raise Exception('Please rename git checkout directory from "pyeq3-master" to "pyeq3"')
-exampleFileDirectory = sys.path[0][:sys.path[0].rfind(os.sep)]
-pyeq3IimportDirectory =  os.path.join(os.path.join(os.path.join(exampleFileDirectory, '..'), '..'), '..')
-if pyeq3IimportDirectory not in sys.path:
-    sys.path.append(pyeq3IimportDirectory)
-    
 import pyeq3
+
+
+from . import AdditionalInfo
 
 
 
@@ -484,6 +481,21 @@ class Report_ModelScatterConfidenceGraph(PanelContainingOneGraphReport):
 
 
 
+class AdditionalInfoReport(wx.Panel):
+    def __init__(self, parent, inText):
+        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+        
+        self.text = wx.TextCtrl(self, -1, '\n', style=wx.TE_MULTILINE| wx.VSCROLL|wx.TE_READONLY)
+        self.text.AppendText(inText)
+
+        sizer = wx.BoxSizer()
+        sizer.Add(self.text, 1, wx.EXPAND)
+    
+        self.SetSizer(sizer)
+        self.Fit()
+
+
+
 # see the included wxNestedTabsExample.py file
 class TopLevelResultsNotebook(wx.Notebook):
     def __init__(self, parent, equation):
@@ -577,6 +589,19 @@ class TopLevelResultsNotebook(wx.Notebook):
         equationList = EquationListReport(self, dim)
         self.AddPage(equationList, "List Of Standard " + str(dim) + "D Equations")
 
+        # additional information
+        additionalInfoTab = wx.Notebook(self)
+        self.AddPage(additionalInfoTab, "Additional Information")
+
+        info = AdditionalInfoReport(additionalInfoTab, AdditionalInfo.history)
+        additionalInfoTab.AddPage(info, "Fitting History")
+
+        info = AdditionalInfoReport(additionalInfoTab, AdditionalInfo.author)
+        additionalInfoTab.AddPage(info, "Author History")
+
+        info = AdditionalInfoReport(additionalInfoTab, AdditionalInfo.links)
+        additionalInfoTab.AddPage(info, "Web Links")
+
 
 
 # see the included wxNestedTabsExample.py file
@@ -605,16 +630,3 @@ class StatusDialog(wx.Dialog):
         wx.Dialog.__init__(self, parent, -1, caption, pos, size, style)
         self.CenterOnParent()
         self.text = wx.TextCtrl(self, -1, msg, style=wx.TE_MULTILINE | wx.TE_READONLY)
-
-
-
-if __name__ == "__main__":
-    app = wx.App()
-    import pickle
-    f = open("pickledEquationFile", "rb")
-    unPickledEquation = pickle.load(f)
-    f.close()
-    os.remove("pickledEquationFile")
-    resultsFrame = ResultsFrame(None, '', "Fitting Results (resizable dialog)", equation=unPickledEquation)
-    resultsFrame.Show()
-    app.MainLoop()
