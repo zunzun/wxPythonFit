@@ -3,7 +3,7 @@ URL for animated "Common Problems In Curve Fitting":
 http://commonproblems.readthedocs.io/
 
 URL for source code of this computer program:
-https://github.com/zunzun/wxPythonFit
+https://github.com/zunzun/tkInterFit
 
 URL for web version of this code, which generates \
 PDF files and animated 3D surface rotations:
@@ -48,17 +48,7 @@ This finally led to the development of my Python fitting libraries, and \
 this example tkinter curve and surface fitter. I also have Python 2 and 3 \
 wxPython and django versions on GitHub.
 
-I hope you find this code useful, and to that end I have sprinkled \
-explanatory comments throughout the code.  If you have any questions \
-or comments, please e-mail me directly at zunzun@zunzun.com \
-or by posting to the user group at the URL
-https://groups.google.com/forum/#!forum/zunzun_dot_com
-
-James R. Phillips
-2548 Vera Cruz Drive
-Birmingham, AL 35235 USA
-
-email: zunzun@zunzun.com
+James
 '''
 
 history = '''
@@ -99,10 +89,12 @@ choosing the one in the code, a genetic algorithm named \
 
 
 I hope you find this code useful, and to that end I have sprinkled \
-explanatory comments throughout the code.  If you have any questions \
-or comments, please e-mail me directly at zunzun@zunzun.com \
+explanatory comments throughout the code.  If you have any questions, \
+comments or ridicule, please e-mail me directly at zunzun@zunzun.com \
 or by posting to the user group at the URL
 https://groups.google.com/forum/#!forum/zunzun_dot_com
+
+I will be glad to help you.
 
 James R. Phillips
 2548 Vera Cruz Drive
