@@ -17,7 +17,7 @@ https://github.com/zunzun/pyeq3
 '''
 
 author = '''
-This is James Phillips, author of tkInterFit. My background is in \
+This is James Phillips, author of wxPythonFit. My background is in \
 nuclear engineering and industrial radiation physics, as I started \
 working in the U.S. Navy as a submarine nuclear reactor operator \
 many, many neutrons ago.
