@@ -1,4 +1,4 @@
-The tkInterFit project is dedicated to Jesus of Nazareth, son of the living God.
+The wxPythonFit project is dedicated to Jesus of Nazareth, son of the living God.
 
 Ephesians 4:28
 
