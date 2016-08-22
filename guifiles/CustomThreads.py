@@ -35,7 +35,7 @@ class FittingThread(threading.Thread):
         time.sleep(0.5) # allow users to see the update
         self.equation.CalculateCoefficientAndFitStatistics()
 
-        statusString = 'Creating reports...'
+        statusString = 'Fitting complete, creating graphs and reports...'
         wx.PostEvent(self._notify_window, CustomEvents.ThreadStatusEvent(statusString))
         time.sleep(0.5) # allow users to see the update
             
