@@ -154,8 +154,8 @@ class EquationListReport(wx.Panel):
         
                             equation = equationClass[1]('SSQABS', extendedVersionName)
                             htmlToReturn += '<tr>'
-                            htmlToReturn += '<td nowrap>' + str(dim) + 'D ' + submodule[0] + '</td>'
-                            htmlToReturn += '<td nowrap>' + equation.GetDisplayName() + '</td>'
+                            htmlToReturn += '<td nowrap><b>' + str(dim) + 'D ' + submodule[0] + '</b></td>'
+                            htmlToReturn += '<td nowrap><i>' + equation.GetDisplayName() + '</i></td>'
                             htmlToReturn += '<td nowrap>' + equation.GetDisplayHTML() + '</td>'
                             htmlToReturn += '</tr>'
                             
