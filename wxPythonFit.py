@@ -159,7 +159,7 @@ class ApplicationFrame(wx.Frame):
         # the GUI's fitting target string contains what we need - extract it
         fittingTarget = fittingTargetSelection.split('(')[1].split(')')[0]
 
-        item = dfc.eq_od2D[equationSelection]
+        item = dfc.eq_od3D[equationSelection]
         eqString = 'pyeq3.Models_3D.' + item[0] + '(fittingTarget, ' + "'" + item[1] + "'" + item[2] + ')'
         self.equation = eval(eqString)
 
