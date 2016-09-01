@@ -23,6 +23,12 @@ and then install wxPython from the web site:
 http://www.wxpython.org/
 
 
+NOTE: if you would like to create PDF files of the fitting results,
+please also install reportlab using pip:
+
+pip3 install reportlab
+
+
 
 Step 2: Install the pyeq3 fitting library with pip
 
