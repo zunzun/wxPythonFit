@@ -498,94 +498,141 @@ class AdditionalInfoReport(wx.Panel):
 
 # see the included wxNestedTabsExample.py file
 class TopLevelResultsNotebook(wx.Notebook):
-    def __init__(self, parent, equation):
+    def __init__(self, parent, inEquation):
         wx.Notebook.__init__(self, parent, id=wx.ID_ANY, style=wx.BK_DEFAULT)
+        self.equation = inEquation
         
+        self.graphReportsListForPDF = []
+        self.textReportsListForPDF = []
+        self.sourceCodeReportsListForPDF = []
+
         # graphs
         graphReportsTab = wx.Notebook(self)
         self.AddPage(graphReportsTab, "Graph Reports")
         
-        if equation.GetDimensionality() == 2:
-            modelConfidenceScatter = Report_ModelScatterConfidenceGraph(graphReportsTab)
-            modelConfidenceScatter.draw(equation)
-            graphReportsTab.AddPage(modelConfidenceScatter, "Model With 95%Confidence")
+        if self.equation.GetDimensionality() == 2:
+            report = Report_ModelScatterConfidenceGraph(graphReportsTab)
+            report.draw(self.equation)
+            reportName = "Model With 95%Confidence"
+            graphReportsTab.AddPage(report, reportName)
+            self.graphReportsListForPDF.append([report.figure, reportName])
         else:
-            surfacePlot = Report_SurfacePlot(graphReportsTab)
-            surfacePlot.draw(equation)
-            graphReportsTab.AddPage(surfacePlot, "Surface Plot")
+            report = Report_SurfacePlot(graphReportsTab)
+            report.draw(self.equation)
+            reportName = "Surface Plot"
+            graphReportsTab.AddPage(report, reportName)
+            self.graphReportsListForPDF.append([report.figure, reportName])
             
-            contourPlot = Report_ContourPlot(graphReportsTab)
-            contourPlot.draw(equation)
-            graphReportsTab.AddPage(contourPlot, "Contour Plot")
+            report = Report_ContourPlot(graphReportsTab)
+            report.draw(self.equation)
+            reportName = "Contour Plot"
+            graphReportsTab.AddPage(report, reportName)
+            self.graphReportsListForPDF.append([report.figure, reportName])
 
-        absoluteErrorGraph = Report_AbsoluteErrorGraph(graphReportsTab)
-        absoluteErrorGraph.draw(equation)
-        graphReportsTab.AddPage(absoluteErrorGraph, "Absolute Error")
+        report = Report_AbsoluteErrorGraph(graphReportsTab)
+        report.draw(self.equation)
+        reportName = "Absolute Error"
+        graphReportsTab.AddPage(report, reportName)
+        self.graphReportsListForPDF.append([report.figure, reportName])
 
-        absoluteErrorHistogram = Report_AbsoluteErrorHistogram(graphReportsTab)
-        absoluteErrorHistogram.draw(equation)
-        graphReportsTab.AddPage(absoluteErrorHistogram, "Absolute Error Histogram")
+        report = Report_AbsoluteErrorHistogram(graphReportsTab)
+        report.draw(self.equation)
+        reportName = "Absolute Error Histogram"
+        graphReportsTab.AddPage(report, reportName)
+        self.graphReportsListForPDF.append([report.figure, reportName])
 
-        if equation.dataCache.DependentDataContainsZeroFlag != 1:
-            percentErrorGraph = Report_PercentErrorGraph(graphReportsTab)
-            percentErrorGraph.draw(equation)
-            graphReportsTab.AddPage(percentErrorGraph, "Percent Error")
+        if self.equation.dataCache.DependentDataContainsZeroFlag != 1:
+            report = Report_PercentErrorGraph(graphReportsTab)
+            report.draw(self.equation)
+            reportName = "Percent Error"
+            graphReportsTab.AddPage(report, reportName)
+            self.graphReportsListForPDF.append([report.figure, reportName])
      
-            percentErrorHistogram = Report_PercentErrorHistogram(graphReportsTab)
-            percentErrorHistogram.draw(equation)
-            graphReportsTab.AddPage(percentErrorHistogram, "Percent Error Histogram")
+            report = Report_PercentErrorHistogram(graphReportsTab)
+            report.draw(self.equation)
+            reportName = "Percent Error Histogram"
+            graphReportsTab.AddPage(report, reportName)
+            self.graphReportsListForPDF.append([report.figure, reportName])
        
         textReportsTab = wx.Notebook(self)
         self.AddPage(textReportsTab, "Text Reports")
         
-        textReport1 = CoefficientAndFitStatisticsReport(textReportsTab, equation)
-        textReportsTab.AddPage(textReport1, "Coefficient And Fit Statistics")
+        report = CoefficientAndFitStatisticsReport(textReportsTab, self.equation)
+        reportName = "Coefficient And Fit Statistics"
+        textReportsTab.AddPage(report, reportName)
+        self.textReportsListForPDF.append([str(report.text.GetValue()), reportName])
         
-        textReport2 = CoefficientsReport(textReportsTab, equation)
-        textReportsTab.AddPage(textReport2, "Coefficient Listing")
+        report = CoefficientsReport(textReportsTab, self.equation)
+        reportName = "Coefficient Listing"
+        textReportsTab.AddPage(report, reportName)
+        self.textReportsListForPDF.append([str(report.text.GetValue()), reportName])
         
-        textReport3 = DataArrayStatisticsReport(textReportsTab, 'Absolute Error Statistics', equation.modelAbsoluteError)
-        textReportsTab.AddPage(textReport3, "Absolute Error Statistics")
+        report = DataArrayStatisticsReport(textReportsTab, 'Absolute Error Statistics', self.equation.modelAbsoluteError)
+        reportName = "Absolute Error Statistics"
+        textReportsTab.AddPage(report, reportName)
+        self.textReportsListForPDF.append([str(report.text.GetValue()), reportName])
         
-        if equation.dataCache.DependentDataContainsZeroFlag != 1:
-            textReport4 = DataArrayStatisticsReport(textReportsTab, 'Percent Error Statistics', equation.modelPercentError)
-            textReportsTab.AddPage(textReport4, "Percent Error Statistics")
+        if self.equation.dataCache.DependentDataContainsZeroFlag != 1:
+            report = DataArrayStatisticsReport(textReportsTab, 'Percent Error Statistics', self.equation.modelPercentError)
+            reportName = "Percent Error Statistics"
+            textReportsTab.AddPage(report, reportName)
+            self.textReportsListForPDF.append([str(report.text.GetValue()), reportName])
 
         sourceCodeTab = wx.Notebook(self)
         self.AddPage(sourceCodeTab, "Source Code")
 
-        sourcecode1 = SourceCodeReport(sourceCodeTab, equation, 'CPP')
-        sourceCodeTab.AddPage(sourcecode1, "C++")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'CPP')
+        reportName = "C++"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
 
-        sourcecode2 = SourceCodeReport(sourceCodeTab, equation, 'CSHARP')
-        sourceCodeTab.AddPage(sourcecode2, "CSHARP")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'CSHARP')
+        reportName = "CSHARP"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
     
-        sourcecode3 = SourceCodeReport(sourceCodeTab, equation, 'VBA')
-        sourceCodeTab.AddPage(sourcecode3, "VBA")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'VBA')
+        reportName = "VBA"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
     
-        sourcecode4 = SourceCodeReport(sourceCodeTab, equation, 'PYTHON')
-        sourceCodeTab.AddPage(sourcecode4, "PYTHON")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'PYTHON')
+        reportName = "PYTHON"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
     
-        sourcecode5 = SourceCodeReport(sourceCodeTab, equation, 'JAVA')
-        sourceCodeTab.AddPage(sourcecode5, "JAVA")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'JAVA')
+        reportName = "JAVA"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
     
-        sourcecode6 = SourceCodeReport(sourceCodeTab, equation, 'JAVASCRIPT')
-        sourceCodeTab.AddPage(sourcecode6, "JAVASCRIPT")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'JAVASCRIPT')
+        reportName = "JAVASCRIPT"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
     
-        sourcecode7 = SourceCodeReport(sourceCodeTab, equation, 'JULIA')
-        sourceCodeTab.AddPage(sourcecode7, "JULIA")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'JULIA')
+        reportName = "JULIA"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
     
-        sourcecode8 = SourceCodeReport(sourceCodeTab, equation, 'SCILAB')
-        sourceCodeTab.AddPage(sourcecode8, "SCILAB")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'SCILAB')
+        reportName = "SCILAB"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
     
-        sourcecode9 = SourceCodeReport(sourceCodeTab, equation, 'MATLAB')
-        sourceCodeTab.AddPage(sourcecode9, "MATLAB")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'MATLAB')
+        reportName = "MATLAB"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
 
-        sourcecode10 = SourceCodeReport(sourceCodeTab, equation, 'FORTRAN90')
-        sourceCodeTab.AddPage(sourcecode10, "FORTRAN90")
+        report = SourceCodeReport(sourceCodeTab, self.equation, 'FORTRAN90')
+        reportName = "FORTRAN90"
+        sourceCodeTab.AddPage(report, reportName)
+        self.sourceCodeReportsListForPDF.append([str(report.text.GetValue()), reportName])
 
         # equation list
-        dim = equation.GetDimensionality()
+        dim = self.equation.GetDimensionality()
         equationList = EquationListReport(self, dim)
         self.AddPage(equationList, "List Of Standard " + str(dim) + "D Equations")
 
@@ -601,6 +648,37 @@ class TopLevelResultsNotebook(wx.Notebook):
 
         info = AdditionalInfoReport(additionalInfoTab, AdditionalInfo.links)
         additionalInfoTab.AddPage(info, "Web Links")
+
+        # additional information
+        pdfPanel = wx.Panel(self, id=wx.ID_ANY)
+        self.AddPage(pdfPanel, "Save To PDF File")
+
+        btnCreatePDF = wx.Button(pdfPanel, -1, "Save To PDF")
+        self.Bind(wx.EVT_BUTTON, self.createPDF, btnCreatePDF)
+
+
+    def createPDF(self, evt):
+        try:
+            import reportlab
+        except:
+            wx.MessageBox("\nCould not import reportlab.\n\nPlease install using the command\n\n'pip3 install reportlab'", "Error")
+            return
+
+        fd =wx.FileDialog(self, "PDF file name", "", "",
+                                "PDF files (*.pdf)|*.pdf", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+                                
+        fName = ''
+        if fd.ShowModal() != wx.CANCEL:
+            fName = fd.GetPath()
+        if fName:
+            from . import pdfCode
+            pdfCode.CreatePDF(fName,
+                              self.equation,
+                              self.graphReportsListForPDF,
+                              self.textReportsListForPDF,
+                              self.sourceCodeReportsListForPDF
+                              )
+            wx.MessageBox("\nSuccessfully created PDF file.", "Success")
 
 
 
