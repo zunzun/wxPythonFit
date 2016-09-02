@@ -4,7 +4,6 @@ import wx
 import guifiles.CustomDialogs as CustomDialogs
 
 
-
 app = wx.App()
 f = open("pickledEquationFile", "rb")
 unPickledEquation = pickle.load(f)
