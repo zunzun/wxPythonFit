@@ -36,21 +36,21 @@ class ApplicationFrame(wx.Frame):
                 
         # use "self" because of references in other methods
         self.rbFittingTargetChoice_2D = wx.RadioBox(
-            p, -1, "Fitting Target 2D", wx.DefaultPosition, wx.DefaultSize,
+            p, -1, "--- Fitting Target 2D ---", wx.DefaultPosition, wx.DefaultSize,
             dfc.fittingTargetList, 1, wx.RA_SPECIFY_COLS
         )
         self.rbFittingTargetChoice_3D = wx.RadioBox(
-            p, -1, "Fitting Target 3D", wx.DefaultPosition, wx.DefaultSize,
+            p, -1, "--- Fitting Target 3D ---", wx.DefaultPosition, wx.DefaultSize,
             dfc.fittingTargetList, 1, wx.RA_SPECIFY_COLS
         )
             
         # use "self" because of references in other methods
         self.rbEqChoice_2D = wx.RadioBox(
-            p, -1, "Example 2D Equations", wx.DefaultPosition, wx.DefaultSize,
+            p, -1, "--- Example 2D Equations ---", wx.DefaultPosition, wx.DefaultSize,
             list(dfc.eq_od2D.keys()), 1, wx.RA_SPECIFY_COLS
         )
         self.rbEqChoice_3D = wx.RadioBox(
-            p, -1, "Example 3D Equations", wx.DefaultPosition, wx.DefaultSize,
+            p, -1, "--- Example 3D Equations ---", wx.DefaultPosition, wx.DefaultSize,
             list(dfc.eq_od3D.keys()), 1, wx.RA_SPECIFY_COLS
         )
 
