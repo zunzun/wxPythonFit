@@ -422,54 +422,80 @@ class ContourPlot(PanelContainingOneGraph):
 
 
 
-class ModelScatterConfidenceGraph(PanelContainingOneGraph):
+class ScatterPlot(PanelContainingOneGraph):
     def draw(self, equation):
+        if not self.parent.x_data:
+            self.parent.x_data = equation.dataCache.allDataCacheDictionary['IndependentData'][0]
+        if not self.parent.y_data:
+            self.parent.y_data = equation.dataCache.allDataCacheDictionary['IndependentData'][1]
+        if not self.parent.z_data:
+            self.parent.z_data = equation.dataCache.allDataCacheDictionary['DependentData']
+            
+        from mpl_toolkits.mplot3d import Axes3D # 3D apecific
+        from matplotlib import cm # to colormap from blue to red
+        
+        self.axes = self.figure.gca(projection='3d')
+    
+        self.axes.scatter(self.parent.x_data, self.parent.y_data, self.parent.z_data)
+    
+        self.axes.set_title('Scatter Plot (click-drag with mouse)') # add a title for surface plot
+        self.axes.set_xlabel('X Data') # X axis data label
+        self.axes.set_ylabel('Y Data') # Y axis data label
+        self.axes.set_zlabel('Z Data') # Z axis data label
+
+
+
+class ModelScatterConfidenceGraph(PanelContainingOneGraph):
+    def draw(self, equation, scatterplotOnlyFlag):
         if not self.parent.y_data:
             self.parent.y_data = equation.dataCache.allDataCacheDictionary['DependentData']
         if not self.parent.x_data:
             self.parent.x_data = equation.dataCache.allDataCacheDictionary['IndependentData'][0]
-
-        # now create data for the fitted equation plot
-        xModel = numpy.linspace(min(self.parent.x_data), max(self.parent.x_data))
-    
-        tempcache = equation.dataCache
-        equation.dataCache = pyeq3.dataCache()
-        equation.dataCache.allDataCacheDictionary['IndependentData'] = numpy.array([xModel, xModel])
-        equation.dataCache.FindOrCreateAllDataCache(equation)
-        yModel = equation.CalculateModelPredictions(equation.solvedCoefficients, equation.dataCache.allDataCacheDictionary)
-        equation.dataCache = tempcache
     
         # first the raw data as a scatter plot
         self.axes.plot(self.parent.x_data, self.parent.y_data,  'D')
     
-        # now the model as a line plot
-        self.axes.plot(xModel, yModel)
-    
-        # now calculate confidence intervals
-        # http://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_nlin_sect026.htm
-        # http://www.staff.ncl.ac.uk/tom.holderness/software/pythonlinearfit
-        mean_x = numpy.mean(self.parent.x_data)			# mean of x
-        n = equation.nobs		    # number of samples in the origional fit
-    
-        t_value = scipy.stats.t.ppf(0.975, equation.df_e) # (1.0 - (a/2)) is used for two-sided t-test critical value, here a = 0.05
-    
-        confs = t_value * numpy.sqrt((equation.sumOfSquaredErrors/equation.df_e)*(1.0/n + (numpy.power((xModel-mean_x),2.0)/
-                                                                                                 ((numpy.sum(numpy.power(self.parent.x_data,2.0)))-n*(numpy.power(mean_x,2.0))))))
-    
-        upper = yModel + abs(confs)
-        lower = yModel - abs(confs)
+        if not scatterplotOnlyFlag:
+            # now create data for the fitted equation plot
+            xModel = numpy.linspace(min(self.parent.x_data), max(self.parent.x_data))
         
-        # mask off any numbers outside the existing plot limits
-        booleanMask = yModel > matplotlib.pyplot.ylim()[0]
-        booleanMask &= (yModel < matplotlib.pyplot.ylim()[1])
+            tempcache = equation.dataCache
+            equation.dataCache = pyeq3.dataCache()
+            equation.dataCache.allDataCacheDictionary['IndependentData'] = numpy.array([xModel, xModel])
+            equation.dataCache.FindOrCreateAllDataCache(equation)
+            yModel = equation.CalculateModelPredictions(equation.solvedCoefficients, equation.dataCache.allDataCacheDictionary)
+            equation.dataCache = tempcache
+            # now the model as a line plot
+            self.axes.plot(xModel, yModel)
+        
+            # now calculate confidence intervals
+            # http://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_nlin_sect026.htm
+            # http://www.staff.ncl.ac.uk/tom.holderness/software/pythonlinearfit
+            mean_x = numpy.mean(self.parent.x_data)			# mean of x
+            n = equation.nobs		    # number of samples in the origional fit
+        
+            t_value = scipy.stats.t.ppf(0.975, equation.df_e) # (1.0 - (a/2)) is used for two-sided t-test critical value, here a = 0.05
+        
+            confs = t_value * numpy.sqrt((equation.sumOfSquaredErrors/equation.df_e)*(1.0/n + (numpy.power((xModel-mean_x),2.0)/
+                                                                                                     ((numpy.sum(numpy.power(self.parent.x_data,2.0)))-n*(numpy.power(mean_x,2.0))))))
+        
+            upper = yModel + abs(confs)
+            lower = yModel - abs(confs)
+            
+            # mask off any numbers outside the existing plot limits
+            booleanMask = yModel > matplotlib.pyplot.ylim()[0]
+            booleanMask &= (yModel < matplotlib.pyplot.ylim()[1])
+        
+            # color scheme improves visibility on black background lines or points
+            self.axes.plot(xModel[booleanMask], lower[booleanMask], linestyle='solid', color='white')
+            self.axes.plot(xModel[booleanMask], upper[booleanMask], linestyle='solid', color='white')
+            self.axes.plot(xModel[booleanMask], lower[booleanMask], linestyle='dashed', color='blue')
+            self.axes.plot(xModel[booleanMask], upper[booleanMask], linestyle='dashed', color='blue')
     
-        # color scheme improves visibility on black background lines or points
-        self.axes.plot(xModel[booleanMask], lower[booleanMask], linestyle='solid', color='white')
-        self.axes.plot(xModel[booleanMask], upper[booleanMask], linestyle='solid', color='white')
-        self.axes.plot(xModel[booleanMask], lower[booleanMask], linestyle='dashed', color='blue')
-        self.axes.plot(xModel[booleanMask], upper[booleanMask], linestyle='dashed', color='blue')
-    
-        self.axes.set_title('Model With 95% Confidence Intervals') # add a title
+        if not scatterplotOnlyFlag:
+            self.axes.set_title('Model With 95% Confidence Intervals') # add a title
+        else:
+            self.axes.set_title('Scatter Plot') # add a title
         self.axes.set_xlabel('X Data') # X axis data label
         self.axes.set_ylabel('Y Data') # Y axis data label
 

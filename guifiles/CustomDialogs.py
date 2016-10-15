@@ -20,8 +20,14 @@ class TopLevelResultsNotebook(wx.Notebook):
         
         if self.equation.GetDimensionality() == 2:
             report = reports.ModelScatterConfidenceGraph(graphReportsTab)
-            report.draw(self.equation)
+            report.draw(self.equation, scatterplotOnlyFlag=False)
             reportName = "Model With 95%Confidence"
+            graphReportsTab.AddPage(report, reportName)
+            self.graphReportsListForPDF.append([report.figure, reportName])
+            
+            report = reports.ModelScatterConfidenceGraph(graphReportsTab)
+            report.draw(self.equation, scatterplotOnlyFlag=True)
+            reportName = "Scatter Plot"
             graphReportsTab.AddPage(report, reportName)
             self.graphReportsListForPDF.append([report.figure, reportName])
         else:
@@ -34,6 +40,12 @@ class TopLevelResultsNotebook(wx.Notebook):
             report = reports.ContourPlot(graphReportsTab)
             report.draw(self.equation)
             reportName = "Contour Plot"
+            graphReportsTab.AddPage(report, reportName)
+            self.graphReportsListForPDF.append([report.figure, reportName])
+
+            report = reports.ScatterPlot(graphReportsTab)
+            report.draw(self.equation)
+            reportName = "Scatter Plot"
             graphReportsTab.AddPage(report, reportName)
             self.graphReportsListForPDF.append([report.figure, reportName])
 
