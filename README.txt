@@ -48,7 +48,7 @@ python3 wxPythonFit.py
 
 Step 4: Celebrate
 
-You are now curve and surface fitting data using wxPython!
+You are now curve fitting and surface fitting with wxPython!
 
 
 
