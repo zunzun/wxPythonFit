@@ -27,6 +27,8 @@ class ApplicationFrame(wx.Frame):
         # no need to use "self." as these are not referenced by other methods
         label1 = wx.StaticText(p, -1, "--- 2D Data Text Editor ---")
         label2 = wx.StaticText(p, -1, "--- 3D Data Text Editor ---")
+        label3 = wx.StaticText(p, -1, "--- Standard 2D Equations ---")
+        label4 = wx.StaticText(p, -1, "--- Standard 3D Equations ---")
 
         # use "self" because of references in other methods
         self.text_2D = wx.TextCtrl(p, -1, dfc.exampleText_2D,
@@ -65,7 +67,7 @@ class ApplicationFrame(wx.Frame):
         self.btnFit3D = wx.Button(p, -1, "Fit 3D Text Data")
          
         # setup the layout with grid sizer
-        fgs = wx.FlexGridSizer(6, 2, 10, 20)
+        fgs = wx.FlexGridSizer(7, 2, 10, 20)
         fgs.AddGrowableRow(1)
         fgs.AddGrowableCol(0)
         fgs.AddGrowableCol(1)
@@ -73,6 +75,8 @@ class ApplicationFrame(wx.Frame):
         fgs.Add(label2, 0, wx.ALIGN_CENTER_HORIZONTAL)
         fgs.Add(self.text_2D, 0, wx.EXPAND)
         fgs.Add(self.text_3D, 0, wx.EXPAND)
+        fgs.Add(label3, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        fgs.Add(label4, 0, wx.ALIGN_CENTER_HORIZONTAL)
         fgs.Add(self.ch_Modules2D, 0, wx.EXPAND)
         fgs.Add(self.ch_Modules3D, 0, wx.EXPAND)
         fgs.Add(self.ch_Equations2D, 0, wx.EXPAND)
