@@ -1,4 +1,4 @@
-import os, sys, pickle
+import os, sys, pickle, inspect
 
 import wx # ensure this import works before starting the application
 import matplotlib # ensure this import works before starting the application
@@ -45,21 +45,27 @@ class ApplicationFrame(wx.Frame):
         )
             
         # use "self" because of references in other methods
-        self.rbEqChoice_2D = wx.RadioBox(
-            p, -1, "--- Example 2D Equations ---", wx.DefaultPosition, wx.DefaultSize,
-            list(dfc.eq_od2D.keys()), 1, wx.RA_SPECIFY_COLS
-        )
-        self.rbEqChoice_3D = wx.RadioBox(
-            p, -1, "--- Example 3D Equations ---", wx.DefaultPosition, wx.DefaultSize,
-            list(dfc.eq_od3D.keys()), 1, wx.RA_SPECIFY_COLS
-        )
+        moduleNameList = list(dfc.eq_od2D.keys())
+        self.ch_Modules2D = wx.Choice(p, -1, choices=moduleNameList)
+        self.ch_Modules2D.SetSelection(moduleNameList.index('Polynomial'))
+        equationNameList = self.GetEquationListForModule(2, 'Polynomial')
+        self.ch_Equations2D = wx.Choice(p, -1, choices=equationNameList)
+        self.ch_Equations2D.SetSelection(equationNameList.index('1st Order (Linear)'))
+
+        # use "self" because of references in other methods
+        moduleNameList = list(dfc.eq_od3D.keys())
+        self.ch_Modules3D = wx.Choice(p, -1, choices=moduleNameList)
+        self.ch_Modules3D.SetSelection(moduleNameList.index('Polynomial'))
+        equationNameList = self.GetEquationListForModule(3, 'Polynomial')
+        self.ch_Equations3D = wx.Choice(p, -1, choices=equationNameList)
+        self.ch_Equations3D.SetSelection(equationNameList.index('Linear'))
 
         # use "self" because of references in other methods
         self.btnFit2D = wx.Button(p, -1, "Fit 2D Text Data")
         self.btnFit3D = wx.Button(p, -1, "Fit 3D Text Data")
          
         # setup the layout with grid sizer
-        fgs = wx.FlexGridSizer(5, 2, 10, 20)
+        fgs = wx.FlexGridSizer(6, 2, 10, 20)
         fgs.AddGrowableRow(1)
         fgs.AddGrowableCol(0)
         fgs.AddGrowableCol(1)
@@ -67,8 +73,10 @@ class ApplicationFrame(wx.Frame):
         fgs.Add(label2, 0, wx.ALIGN_CENTER_HORIZONTAL)
         fgs.Add(self.text_2D, 0, wx.EXPAND)
         fgs.Add(self.text_3D, 0, wx.EXPAND)
-        fgs.Add(self.rbEqChoice_2D, 0, wx.ALIGN_CENTER_HORIZONTAL)
-        fgs.Add(self.rbEqChoice_3D, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        fgs.Add(self.ch_Modules2D, 0, wx.EXPAND)
+        fgs.Add(self.ch_Modules3D, 0, wx.EXPAND)
+        fgs.Add(self.ch_Equations2D, 0, wx.EXPAND)
+        fgs.Add(self.ch_Equations3D, 0, wx.EXPAND)
         fgs.Add(self.rbFittingTargetChoice_2D, 0, wx.ALIGN_CENTER_HORIZONTAL)
         fgs.Add(self.rbFittingTargetChoice_3D, 0, wx.ALIGN_CENTER_HORIZONTAL)
         fgs.Add(self.btnFit2D, 0, wx.ALIGN_CENTER_HORIZONTAL)
@@ -86,6 +94,10 @@ class ApplicationFrame(wx.Frame):
         # use "self" because of references in other methods
         self.statusBox = CustomDialogs.StatusDialog(self, '', "Status")
         
+        # Bind the equation module choices to their application methods
+        self.Bind(wx.EVT_CHOICE, self.moduleSelectChanged_2D, self.ch_Modules2D)
+        self.Bind(wx.EVT_CHOICE, self.moduleSelectChanged_3D, self.ch_Modules3D)
+
         # Bind the button events to their application methods
         self.Bind(wx.EVT_BUTTON, self.OnFit2D, self.btnFit2D)
         self.Bind(wx.EVT_BUTTON, self.OnFit3D, self.btnFit3D)
@@ -94,6 +106,54 @@ class ApplicationFrame(wx.Frame):
         CustomEvents.EVT_THREADSTATUS(self, self.OnThreadStatus)
     
         self.fittingWorkerThread = None
+
+
+    def GetEquationListForModule(self, inDimension, inModuleName):
+        strModule = 'pyeq3.Models_' + str(inDimension) + 'D.' + inModuleName
+        moduleMembers = inspect.getmembers(eval(strModule))
+        returnList = []
+        for equationClass in moduleMembers:
+            if inspect.isclass(equationClass[1]):
+                for extendedVersionName in ['Default', 'Offset']:
+                    
+                    # if the equation *already* has an offset,
+                    # do not add an offset version here
+                    if (-1 != extendedVersionName.find('Offset')) and (equationClass[1].autoGenerateOffsetForm == False):
+                        continue
+                        
+                    # in this application, exclude equation than need extra input
+                    if equationClass[1].splineFlag or \
+                            equationClass[1].userSelectablePolynomialFlag or \
+                            equationClass[1].userCustomizablePolynomialFlag or \
+                            equationClass[1].userSelectablePolyfunctionalFlag or \
+                            equationClass[1].userSelectableRationalFlag or \
+                            equationClass[1].userDefinedFunctionFlag:
+                        continue
+
+                    equation = equationClass[1]('SSQABS', extendedVersionName)
+
+                    returnList.append(equation.GetDisplayName())
+
+        returnList.sort()
+        return returnList
+
+
+    def moduleSelectChanged_2D(self, unused):
+        listIndex = self.ch_Modules2D.GetSelection()
+        moduleName = list(dfc.eq_od2D.keys())[listIndex]
+        equationNameList = self.GetEquationListForModule(2, moduleName)
+        self.ch_Equations2D.Clear()
+        self.ch_Equations2D.AppendItems(equationNameList)
+        self.ch_Equations2D.SetSelection(0)
+
+
+    def moduleSelectChanged_3D(self, unused):
+        listIndex = self.ch_Modules3D.GetSelection()
+        moduleName = list(dfc.eq_od3D.keys())[listIndex]
+        equationNameList = self.GetEquationListForModule(3, moduleName)
+        self.ch_Equations3D.Clear()
+        self.ch_Equations3D.AppendItems(equationNameList)
+        self.ch_Equations3D.SetSelection(0)
 
 
     def OnThreadStatus(self, event):
@@ -117,14 +177,15 @@ class ApplicationFrame(wx.Frame):
 
     def OnFit2D(self, evt):
         textData = str(self.text_2D.GetValue())
-        equationSelection = self.rbEqChoice_2D.GetStringSelection()
+        moduleName = self.ch_Modules2D.GetString(self.ch_Modules2D.GetSelection())
+        equationName = self.ch_Equations2D.GetString(self.ch_Equations2D.GetSelection())
         fittingTargetSelection = self.rbFittingTargetChoice_2D.GetStringSelection()
         
         # the GUI's fitting target string contains what we need - extract it
         fittingTarget = fittingTargetSelection.split('(')[1].split(')')[0]
 
-        item = dfc.eq_od2D[equationSelection]
-        eqString = 'pyeq3.Models_2D.' + item[0] + '(fittingTarget, ' + "'" + item[1] + "'" + item[2] + ')'
+        item = dfc.eq_od2D[moduleName][equationName]
+        eqString = 'pyeq3.Models_2D.' + moduleName + '.' + item[0] + "('" + fittingTarget + "','" + item[1] + "')"
         self.equation = eval(eqString)
 
         # convert text to numeric data checking for log of negative numbers, etc.
@@ -153,14 +214,15 @@ class ApplicationFrame(wx.Frame):
 
     def OnFit3D(self, evt):
         textData = str(self.text_3D.GetValue())
-        equationSelection = self.rbEqChoice_3D.GetStringSelection()
+        moduleName = self.ch_Modules3D.GetString(self.ch_Modules3D.GetSelection())
+        equationName = self.ch_Equations3D.GetString(self.ch_Equations3D.GetSelection())
         fittingTargetSelection = self.rbFittingTargetChoice_3D.GetStringSelection()
         
         # the GUI's fitting target string contains what we need - extract it
         fittingTarget = fittingTargetSelection.split('(')[1].split(')')[0]
 
-        item = dfc.eq_od3D[equationSelection]
-        eqString = 'pyeq3.Models_3D.' + item[0] + '(fittingTarget, ' + "'" + item[1] + "'" + item[2] + ')'
+        item = dfc.eq_od3D[moduleName][equationName]
+        eqString = 'pyeq3.Models_3D.' + moduleName + '.' + item[0] + "('" + fittingTarget + "','" + item[1] + "')"
         self.equation = eval(eqString)
 
         # convert text to numeric data checking for log of negative numbers, etc.
