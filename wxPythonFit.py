@@ -47,18 +47,18 @@ class ApplicationFrame(wx.Frame):
         )
             
         # use "self" because of references in other methods
-        moduleNameList = list(dfc.eq_od2D.keys())
+        moduleNameList = sorted(list(dfc.eq_od2D.keys()))
         self.ch_Modules2D = wx.Choice(p, -1, choices=moduleNameList)
         self.ch_Modules2D.SetSelection(moduleNameList.index('Polynomial'))
-        equationNameList = self.GetEquationListForModule(2, 'Polynomial')
+        equationNameList = sorted(list(dfc.eq_od2D['Polynomial'].keys()))
         self.ch_Equations2D = wx.Choice(p, -1, choices=equationNameList)
         self.ch_Equations2D.SetSelection(equationNameList.index('1st Order (Linear)'))
 
         # use "self" because of references in other methods
-        moduleNameList = list(dfc.eq_od3D.keys())
+        moduleNameList = sorted(list(dfc.eq_od3D.keys()))
         self.ch_Modules3D = wx.Choice(p, -1, choices=moduleNameList)
         self.ch_Modules3D.SetSelection(moduleNameList.index('Polynomial'))
-        equationNameList = self.GetEquationListForModule(3, 'Polynomial')
+        equationNameList = sorted(list(dfc.eq_od3D['Polynomial'].keys()))
         self.ch_Equations3D = wx.Choice(p, -1, choices=equationNameList)
         self.ch_Equations3D.SetSelection(equationNameList.index('Linear'))
 
@@ -112,51 +112,19 @@ class ApplicationFrame(wx.Frame):
         self.fittingWorkerThread = None
 
 
-    def GetEquationListForModule(self, inDimension, inModuleName):
-        strModule = 'pyeq3.Models_' + str(inDimension) + 'D.' + inModuleName
-        moduleMembers = inspect.getmembers(eval(strModule))
-        returnList = []
-        for equationClass in moduleMembers:
-            if inspect.isclass(equationClass[1]):
-                for extendedVersionName in ['Default', 'Offset']:
-                    
-                    # if the equation *already* has an offset,
-                    # do not add an offset version here
-                    if (-1 != extendedVersionName.find('Offset')) and (equationClass[1].autoGenerateOffsetForm == False):
-                        continue
-                        
-                    # in this application, exclude equation than need extra input
-                    if equationClass[1].splineFlag or \
-                            equationClass[1].userSelectablePolynomialFlag or \
-                            equationClass[1].userCustomizablePolynomialFlag or \
-                            equationClass[1].userSelectablePolyfunctionalFlag or \
-                            equationClass[1].userSelectableRationalFlag or \
-                            equationClass[1].userDefinedFunctionFlag:
-                        continue
-
-                    equation = equationClass[1]('SSQABS', extendedVersionName)
-
-                    returnList.append(equation.GetDisplayName())
-
-        returnList.sort()
-        return returnList
-
-
     def moduleSelectChanged_2D(self, unused):
         listIndex = self.ch_Modules2D.GetSelection()
-        moduleName = list(dfc.eq_od2D.keys())[listIndex]
-        equationNameList = self.GetEquationListForModule(2, moduleName)
+        moduleName = sorted(list(dfc.eq_od2D.keys()))[listIndex]
         self.ch_Equations2D.Clear()
-        self.ch_Equations2D.AppendItems(equationNameList)
+        self.ch_Equations2D.AppendItems(sorted(list(dfc.eq_od2D[moduleName].keys())))
         self.ch_Equations2D.SetSelection(0)
 
 
     def moduleSelectChanged_3D(self, unused):
         listIndex = self.ch_Modules3D.GetSelection()
-        moduleName = list(dfc.eq_od3D.keys())[listIndex]
-        equationNameList = self.GetEquationListForModule(3, moduleName)
+        moduleName = sorted(list(dfc.eq_od3D.keys()))[listIndex]
         self.ch_Equations3D.Clear()
-        self.ch_Equations3D.AppendItems(equationNameList)
+        self.ch_Equations3D.AppendItems(sorted(list(dfc.eq_od3D[moduleName].keys())))
         self.ch_Equations3D.SetSelection(0)
 
 
