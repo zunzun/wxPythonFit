@@ -3,15 +3,15 @@ URL for animated "Common Problems In Curve Fitting":
 http://commonproblems.readthedocs.io/
 
 URL for source code of this computer program:
-https://github.com/zunzun/tkInterFit
+https://github.com/zunzun/wxPythonFit/
 
 URL for web version of this code, which generates \
 PDF files and animated 3D surface rotations:
-https://github.com/zunzun/zunzunsite3
+https://github.com/zunzun/zunzunsite3/
 
 URL for the pyeq3 fitting library, which has hundreds \
 of known 2D and 3D equations:
-https://github.com/zunzun/pyeq3
+https://github.com/zunzun/pyeq3/
 
 
 '''
